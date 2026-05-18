@@ -38,3 +38,98 @@ cd /home/users/tss1045/Fecal-Microbiota-Project-Thea/results/
 
 ls
 fastqc_summaries.txt fastqc_untrimmed_reads
+
+trimmomatic
+
+cd fastqs
+
+cp ~/.miniconda3/pkgs/trimmomatic-0.38-0/share/trimmoatic-0.38-0/adapters/NexteraPE-PE.fa .
+
+trimmomatic PE SRR2589044_1.fastq SRR2589044_2.fastq \ SRR2589044_1.trim.fastq SRR2589044_1un.trim.fastq \ SRR2589044_2.trim.fastq SRR2589044_2un.trim.fastq \ SLIDINGWINDOW:4:20 MINLEN:25 ILLUMINACLIP:NexteraPE-PE.fa:2:40:15
+
+ls $CONDA_PREFIX/share/trimmomatic*/adapters
+
+cp /home/share/anaconda/envs/genomics/share/trimmomatic-0.39-2/adapters/NexteraPE-PE.fa .
+
+trimmomatic PE SRR2589044_1.fastq SRR2589044_2.f
+astq                 SRR2589044_1.trim.fastq SRR2589044_1un.trim.fastq           
+      SRR2589044_2.trim.fastq SRR2589044_2un.trim.fastq                 SLIDINGWI
+NDOW:4:20 MINLEN:25 ILLUMINACLIP:NexteraPE-PE.fa:2:40:15
+
+output:Input Read Pairs: 1107090 Both Surviving: 885220 (79.96%) Forward Only Surviving: 216472 (19.55%) Reverse Only Surviving: 2850 (0.26%) Dropped: 2548 (0.23%)
+
+ls SRR2589044*
+
+for infile in *_1.fastq
+do
+base =$(basename ${infile} _1.fastq) \
+trimmomatic PE ${infile} ${base}_2/fastq \
+${base}_1.trim.fastq ${base}_1un.trim.fastq \
+${base}_2.trim.fastq ${base}_2un.trim.fastq \
+SLIDINGWINDOW:4:20 MINLEN:25 ILLUMINACLIP:NexteraPE-PE.fa:2:40:15
+done
+
+mkdir trimmed_fastq
+
+mv *.trim* ../trimmed_fastq
+
+running fastqc again
+
+fastqc ~/Fecal-Microbiota-Project-Thea/fastqs/trimmed_fastq/*.fastq*
+
+curl -L -o data/ref_genome/ecoli_rel606.fasta.gz ftp://ftp.ncbi.nlm.nih.gov
+
+gunzip data/ref_genome/ecoli_rel606.fasta.gz
+
+curl -L -o sub.tar.gz https://ndownloader.figshare.com/files/14418248
+
+tar xvf sub.tar.gz
+
+mv sub/ ~/Fecal-Microbiota-Project-Thea/data/trimmed_fastq_small
+
+mkdir -p results/sam results/bam results/bcf results/vcf
+
+bwa index data/ref_genome/ecoli_rel606.fasta
+
+bwa mem data/ref_genome/ecoli_rel606.fasta data/trimmed_fastq_small/SRR2584866_1.trim.sub.fastq data/trimmed_fastq_small/SRR2584866_2.trim.sub.fastq > results/sam/SRR2584866.aligned.sam
+
+samtools view -S -b results/sam/SRR2584866.aligned.sam >results/bam/SRR2584866.aligned.bam
+
+samtools sort -o results/bam/SRR2584866.aligned.sort.bam results/bam/SRR2584866.aligned.bam'
+
+samtools flagstat results/bam/SRR2584866.aligned.sort.bam
+
+conda activate bcftools-1.21
+
+bcftools mpileup -O b -o results/bcf/SRR2584866_raw.bcf \ -f data/ref_genome/ecoli_rel606.fasta results/bam/SRR2584866.aligned.sort.bam
+
+bcftools call --ploidy 1 -m -v -o results/vcf/SRR2584866_variants.vcf results/bcf/SRR2584866_raw.bcf 
+
+vcfutils.pl varFilter results/vcf/SRR2584866_variants.vcf  > results/vcf/SRR2584866_final_variants.vcf
+
+bcftools stats results/vcf/SRR2584866_variants.vcf | grep TSTV
+# TSTV, transitions/transversions:
+# TSTV	[2]id	[3]ts	[4]tv	[5]ts/tv	[6]ts (1st ALT)	[7]tv (1st ALT)	[8]ts/tv (1st ALT)
+TSTV	0	628	58	10.83	628	58	10.83
+$ bcftools stats results/vcf/SRR2584866_final_variants.vcf | grep TSTV
+# TSTV, transitions/transversions:
+# TSTV	[2]id	[3]ts	[4]tv	[5]ts/tv	[6]ts (1st ALT)	[7]tv (1st ALT)	[8]ts/tv (1st ALT)
+TSTV	0	621	54	11.50	621	54	11.50
+
+bcftools stat results/vcf/SRR2584866_variants.vcf | grep TSTV 
+
+less -S results/vcf/SRR2584866_final_variants.vcf
+
+samtools index results/bam/SRR2584866.aligned.sort.bam
+
+samtools tview results/bam/SRR2584866.aligned.sort.bam data/ref_genome/ecoli_rel606.fasta
+
+mkdir -p ~/Fecal-Microbiota-Project-Thea/scripts
+
+cd ~/Fecal-Microbiota-Project-Thea/scripts
+
+touch read_qc.share
+
+ls
+
+nano read_qc.sh

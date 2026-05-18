@@ -1,0 +1,69 @@
+#### Thea's Final GEN711 Project: Fecal-Microbiota-Project   
+
+### Authors: Thea Sarajlic
+
+### Background:
+As a student interested in microbiology, I had decided that the Fecal Microbiota Project seemed the most interesting to me to work on for my final culminating project for lab. 
+
+For our project, we are using data collected from a long-term evolution project that is being carried out by Richard Lenski- where more than 40,000 generations of E. coli have been grown in glucose-limited minimal medium to see what adaptations would occur. 
+
+For this project- instead of following the protocol provided by Dr. Miller for his projects (diatoms, etc) I will be following the workflow provided in the "wrangling-genomics" Github which is split into 5 modules 
+1. Background
+2. Quality Control
+3. Trimming
+4. Variant Calling
+5. Automation
+
+For this project, data we worked with originating from 3 different samples at different generation periods (5,000, 15,0000 and 50,000). The main goal for this project and workflow is identifying how these populations changed through processing the data and through the variant calling workflow that will help to distinguish differences between these three samples at different generations. 
+
+### Methods 
+## Part One: Downloads and FASTQs
+To get out data for this project, we downloaded from the European Nucleotide Archive. Since the data is paired-end reads we downloaded two files for each sample for a total of 6 files (2 for each sample).
+
+# Fastq files (downloaded from ENA directly to fastq)
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR258/004/SRR2589044/SRR2589044_1.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR258/004/SRR2589044/SRR2589044_2.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR258/003/SRR2584863/SRR2584863_1.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR258/003/SRR2584863/SRR2584863_2.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR258/006/SRR2584866/SRR2584866_1.fastq.gz
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR258/006/SRR2584866/SRR2584866_2.fastq.gz 
+
+This was slightly different than the commands used in the wrangling-genomics module, which used the command curl instead. Both have a similar function for downloading files from online.
+
+The files that we are working with are FASTQs- a common format for sequenced reads that will allow us to begin our workflow. Since these files are large, they came in a compressed format (gzip) so our workflow involved unzipping these files to access and view some of their contents as needed.
+
+These files are useful and contain quality scores that tell us the confidence of each nucleotide.
+
+By running a program called FastQC on our FASTQ files- we can assess quality based on a number of different diagnostics. The FastQC program is part of our conda genomics environment- which allows us to run this program. This gets run through the RON computing cluster at UNH.
+
+# Running FASTQC
+fastqc *.fastq*
+
+## Part Two: Trimming
+In this part of the module, we follow instructions on how to use trimmomatic to find poor quality reads and remove them from our samples.
+
+To be able to do this, I had to find where the Nextera adapters were located in our environment.
+
+ls $CONDA_PREFIX/share/trimmomatic*/adapters
+cp /home/share/anaconda/envs/genomics/share/trimmomatic-0.39-2/adapters/NexteraPE-PE.fa .
+
+To be able to run the command in the same way that the module was telling me, I had to locate the files and copy it into my current directory (this provides a bit of a shortcut for our trimmomatic command). 
+
+To be able to run the trimmmomatic program on all of our files- we used a for loop.
+
+for infile in *_1.fastq
+do
+base =$(basename ${infile} _1.fastq) \
+trimmomatic PE ${infile} ${base}_2/fastq \
+${base}_1.trim.fastq ${base}_1un.trim.fastq \
+${base}_2.trim.fastq ${base}_2un.trim.fastq \
+SLIDINGWINDOW:4:20 MINLEN:25 ILLUMINACLIP:NexteraPE-PE.fa:2:40:15
+done
+
+This was the line of code I used- I had to switch things up slightly from the instructions due to my files having slightly different names than the wrangling-genomics module. 
+
+## Part Three: Variant Calling
+This is an important part fo the work flow and it will show us how generations are different from each other now that the quality of our reads is better. This will involve aligning our samples to a reference genome for E. coli REL606.
+
+### Findings
+

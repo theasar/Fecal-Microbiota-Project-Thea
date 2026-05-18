@@ -1,0 +1,17 @@
+set -e
+cd ~/Fecal-Microbiota-Project-Thea/fastqs
+echo "Running FastQC ..."
+fastqc *.fastq*
+mkdir -p ~/Fecal-Microbiota-Project-Thea/results/fastqc_untrimmed_reads
+echo "Saving FastQC results..."
+mv *.zip ~/Fecal-Microbiota-Project-Thea/results/fastqc_untrimmed_reads/
+mv *.html ~/Fecal-Microbiota-Project-Thea/results/fastqc_untrimmed_reads/
+cd ~/Fecal-Microbiota-Project-Thea/results/fastqc_untrimmed_reads/
+echo "Unzipping..."
+for filename in *.zip
+do 
+unzip $filename
+done
+echo "Saving summary..."
+mkdir -p ~/Fecal-Microbiota-Project-Thea/docs
+cat */summary.txt > ~/Fecal-Microbiota-Project-Thea/results/fastqc_summaries.txt
