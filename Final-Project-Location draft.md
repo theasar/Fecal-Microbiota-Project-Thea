@@ -5,7 +5,7 @@
 ### Background:
 As a student interested in microbiology, I had decided that the Fecal Microbiota Project seemed the most interesting to me to work on for my final culminating project for lab. 
 
-For our project, we are using data collected from a long-term evolution project that is being carried out by Richard Lenski- where more than 40,000 generations of E. coli have been grown in glucose-limited minimal medium to see what adaptations would occur. 
+For our project, we are using data collected from a long-term evolution project that is being carried out by Richard Lenski- where more than 40,000 generations of E. coli have been grown in glucose-limited minimal medium to see what adaptations would occur. Lenski's project explores the genetic bases of adaptation occurring in E. coli that are passaged from a common ancestor- and what gains of fitness occur over the course of serial passaging over many, many generations. Over the course of this experiment, multiple types of mutations have been seen in evolved populations compared to ancestral strains, including: point mutations, deletions, inversions, and insertions (Crozat et al., 2005). Having such a well documented evolutionary experiment provides an excellent opportunity to understand what is happening through a genomics perspective- and sequencing and aligning to a reference genome is one way to explore what changes across populations at different points of times. This can help to further understand what mutations or changes in DNA sequence result in greater fitness and the ability to outperform more ancestral strains that still may be present in culture. 
 
 For this project- instead of following the protocol provided by Dr. Miller for his projects (diatoms, etc) I will be following the workflow provided in the "wrangling-genomics" Github which is split into 5 modules 
 1. Background
@@ -14,7 +14,7 @@ For this project- instead of following the protocol provided by Dr. Miller for h
 4. Variant Calling
 5. Automation
 
-For this project, data we worked with originating from 3 different samples at different generation periods (5,000, 15,0000 and 50,000). The main goal for this project and workflow is identifying how these populations changed through processing the data and through the variant calling workflow that will help to distinguish differences between these three samples at different generations. 
+For this project, data we worked with originating from 3 different samples at different generation periods (5,000, 15,0000 and 50,000). The main goal for this project and workflow is identifying how these populations changed through processing the data and through the variant calling workflow that will help to distinguish differences between these three samples at different generations. The general workflow for this project involved obtaining sequence reads, doing quality control steps, aligning to a genome, cleaning up the alignment, and variant calling as our final step. 
 
 ## Methods 
 ### Part One: Downloads and FASTQs
@@ -137,6 +137,8 @@ done
 
 This was the last step for our workflow in the Fecal Microbiota Project provided.
 
+(Herr et al., 2017)
+
 ## Findings
 
 Before reporting findings, I'd like to note that the information from files SRR2589044 was from generation 5,000, SRR2584863 was from generation 15,000, and SRR2584866 was from generation 50,0000.
@@ -163,3 +165,44 @@ Figure 5:
 Figure 6:
 
 Figures 5,6: Results for the quality scoring for paired end reads of generation 50,000.
+
+Now I will include images from after the trimming process was completed (not including untrimmed pairs).
+
+![alt text](figs/SRR2589044.1trim.quality.png)
+Figure 7:
+![alt text](figs/SRR2589044_2.trim.quality.png)
+Figure 8: 
+
+Figure 7,8: Results for quality scoring after trimming of generation 5,000
+
+![alt text](figs/SRR2584863_1.trim.quality.png)
+Figure 9:
+![alt text](figs/SRR2584863_2.trim.quality.png)
+
+Figure 9,10: Results for quality scoring after trimming of generation 15,000
+
+![alt text](figs/SRR2584866_1.trim.quality.png)
+Figure 10:
+![alt text](figs/SRR2584866_2.trim.quality.png)
+Figure 11:
+
+Figure 10,11: Results for quality scoring after trimming of generation 50,000
+
+Overall, it is very obvious to see how the quality scoring improves, especially towards the end of the sequence. This is important for this workflow as removing bad quality reads will reduce error in identifying variation between generations in our variant calling steps.
+
+One of the most important results that was determined through this process was the amount of variation between generations 
+### Conclusions
+
+Overall, through this project I got to understand the workflow of aligning genomes and looking for variations/mutations a lot better. These are topics we have covered extensively in class, including file formats and what they are used for- but being able to input the code myself and see the results and learn how to interpret them was very useful to me. It felt like getting a whole circle feel for both lecture and lab concepts and I got to apply it to a project that interested me!
+
+If I had the opportunity to further this project and the data that was processed over the course of it- I would maybe look to explore specific variations between generations and see if there are important genes associated with these changes in sequence that were picked out by our variant calling. 
+
+The furthest generation out had the most variations from the reference genome- which can be seen clearly in the VCF files.
+
+### References
+Crozat, E., Philippe, N., Lenski, R. E., Geiselmann, J., & Schneider, D. (2005). Long-term experimental evolution in Escherichia coli. XII. DNA topology as a key target of selection. Genetics, 169(2), 523–532. https://doi.org/10.1534/genetics.104.035717.
+
+Josh Herr, Ming Tang, Lex Nederbragt, Fotis Psomopoulos (eds): "Data Carpentry: Wrangling Genomics Lesson."
+Version 2017.11.0, November 2017,
+http://www.datacarpentry.org/wrangling-genomics/,
+doi: 10.5281/zenodo.1064254
